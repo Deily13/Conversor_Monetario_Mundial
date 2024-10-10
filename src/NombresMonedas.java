@@ -5,7 +5,6 @@ public class NombresMonedas {
     public static Map<String, String> obtenerNombresMonedas() {
         Map<String, String> nombresMonedas = new HashMap<>();
 
-        // Agrega algunos ejemplos de monedas comunes
         nombresMonedas.put("COP", "Pesos colombianos");
         nombresMonedas.put("KWD", "Dinar kuwaití");
         nombresMonedas.put("XAF", "Franco CFA");
