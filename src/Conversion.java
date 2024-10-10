@@ -5,7 +5,7 @@ public class Conversion {
     private double resultado;
     private String fecha;
 
-    // Constructor
+
     public Conversion(String monedaOrigen, String monedaDestino, double cantidad, double resultado, String fecha) {
         this.monedaOrigen = monedaOrigen;
         this.monedaDestino = monedaDestino;
@@ -14,4 +14,23 @@ public class Conversion {
         this.fecha = fecha;
     }
 
+    public String getMonedaOrigen() {
+        return monedaOrigen;
+    }
+
+    public String getMonedaDestino() {
+        return monedaDestino;
+    }
+
+    public double getCantidad() {
+        return cantidad;
+    }
+
+    public double getResultado() {
+        return resultado;
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
 }

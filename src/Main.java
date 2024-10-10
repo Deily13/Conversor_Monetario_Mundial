@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -28,7 +29,8 @@ public class Main {
 
             while (!salir) {
                 System.out.println("1. Convertir Moneda");
-                System.out.println("2. Salir");
+                System.out.println("2. Mostrar historial de busqueda");
+                System.out.println("3. Salir....");
 
                 int opcion = scanner.nextInt();
 
@@ -60,16 +62,21 @@ public class Main {
                             System.out.println("En este preciso momento " + fechaFormateada);
                             System.out.println(cantidad + " " + nombreOrigen + " (" + monedaOrigen + ") equivalen a " + resultado + " " + nombreDestino + " (" + monedaDestino + ")");
 
-
-                            guardarConversionEnArchivo(monedaOrigen, monedaDestino, cantidad, resultado, fechaFormateada);
+                            // Crear un objeto Conversion y guardar en el archivo
+                            Conversion conversion = new Conversion(monedaOrigen, monedaDestino, cantidad, resultado, fechaFormateada);
+                            guardarConversionEnArchivo(conversion);
 
                         } catch (IllegalArgumentException e) {
                             System.out.println("Error: " + e.getMessage());
                         }
-
                         break;
 
+
                     case 2:
+                        mostrarHistorialConversiones();
+                        break;
+
+                    case 3:
                         salir = true;
                         break;
 
@@ -92,21 +99,56 @@ public class Main {
     }
 
 
-    private static void guardarConversionEnArchivo(String monedaOrigen, String monedaDestino, double cantidad, double resultado, String fecha) {
-        // Crear un objeto de conversión
-        Conversion conversion = new Conversion(monedaOrigen, monedaDestino, cantidad, resultado, fecha);
+    private static void guardarConversionEnArchivo(Conversion conversion) {
+        Gson gson = new Gson();  // Usamos Gson sin pretty printing
+        File file = new File("conversiones.json");
 
-        // Serializar el objeto a JSON
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(conversion);
+        try (FileWriter writer = new FileWriter(file, true)) {
 
-        // Escribir el JSON en un archivo
-        try (FileWriter writer = new FileWriter("conversiones.json", true)) {
+            String json = gson.toJson(conversion);
             writer.write(json + "\n");
-            System.out.println("La conversión se ha guardado en el archivo conversiones.json.");
+            System.out.println("|-------------------------------------------------------------|");
+            System.out.println("|La conversión se ha guardado en el archivo conversiones.json.|");
+            System.out.println("'-------------------------------------------------------------'");
         } catch (IOException e) {
-            System.out.println("Error al guardar la conversión en el archivo: " + e.getMessage());
+            System.out.println("Error al guardar la conversión: " + e.getMessage());
         }
     }
+
+
+    private static void mostrarHistorialConversiones() {
+        File file = new File("conversiones.json");
+
+
+        if (!file.exists()) {
+            System.out.println("No hay historial disponible.");
+            return;
+        }
+
+        try (Scanner scanner = new Scanner(file)) {
+            System.out.println("Historial de conversiones:");
+            while (scanner.hasNextLine()) {
+                String jsonLinea = scanner.nextLine().trim();
+
+                if (jsonLinea.isEmpty()) {
+                    continue;  // Si la línea está vacía, la salta
+                }
+
+                try {
+                    Gson gson = new Gson();
+                    Conversion conversion = gson.fromJson(jsonLinea, Conversion.class);
+
+                    System.out.println(conversion.getCantidad() + " " + conversion.getMonedaOrigen() + " (" + conversion.getMonedaOrigen() + ") equivalen a " +
+                            conversion.getResultado() + " " + conversion.getMonedaDestino() + " (" + conversion.getMonedaDestino() + ") - Fecha: " + conversion.getFecha());
+
+                } catch (com.google.gson.JsonSyntaxException e) {
+                    System.out.println("Línea ignorada (no es un JSON válido): " + jsonLinea);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer el historial: " + e.getMessage());
+        }
+    }
+
 
 }
