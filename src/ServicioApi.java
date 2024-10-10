@@ -27,8 +27,6 @@ public class ServicioApi {
 
         // Verificar el código de estado HTTP
         if (respuesta.statusCode() == 200) {
-            // Imprimir el contenido de la respuesta para depuración
-            System.out.println("Respuesta de la API: " + respuesta.body());
 
             // Procesar el JSON y obtener las tasas de cambio
             Gson gson = new Gson();
